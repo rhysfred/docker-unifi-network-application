@@ -56,7 +56,15 @@ if [[ ! -e /config/data/system.properties ]]; then
     fi
 fi
 
-# generate key
+# if they exist, import the key and certificate from /tls-bootstrap into a new keystore
+if [[ -d /tls-bootstrap ]]; then
+    if [[ -f /tls-bootstrap/combined.p12 ]]; then
+       keytool -importkeystore -srckeystore /tls-bootstrap/combined.p12 \
+       -srcstoretype pkcs12 -destkeystore /config/data/keystore -storepass aircontrolenterprise \
+       -keypass aircontrolenterprise
+    fi
+fi
+# Otherwise, generate a keystore
 if [[ ! -f /config/data/keystore ]]; then
     keytool -genkey -keyalg RSA -alias unifi -keystore /config/data/keystore \
     -storepass aircontrolenterprise -keypass aircontrolenterprise -validity 3650 \
